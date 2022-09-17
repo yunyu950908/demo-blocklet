@@ -2,7 +2,6 @@ const querystring = require('node:querystring');
 const axios = require('axios');
 const cheerio = require('cheerio');
 const HTTPBadRequestError = require('../errors/http-bad-request-error');
-const HTTPNotFoundError = require('../errors/http-not-found-error');
 
 class EtherscanService {
   constructor() {
@@ -17,7 +16,7 @@ class EtherscanService {
         tradeHistory: '/txs',
       },
     };
-    this.cache = {};
+    this.cache = {}; // {cacheKey:{data: [], timestamp: Date.now()}}
   }
 
   /**
@@ -50,8 +49,22 @@ class EtherscanService {
     if (page < 1) {
       throw new HTTPBadRequestError('invalid param "page", please leave it empty or pass valid value');
     }
+    // check cache
+    const cacheKey = address.concat(page);
+    const timestamp = Date.now();
+    const cachedData = this.cache[cacheKey];
+    // expires in 1hr
+    if (cachedData && cachedData.timestamp - timestamp < 1000 * 60 * 60) {
+      return cachedData.data;
+    }
+    // fetch and format
     const rawHTML = await this.fetchRawHTML(address, page);
     const data = this.formatter(rawHTML);
+    // set cache
+    this.cache[cacheKey] = {
+      data,
+      timestamp,
+    };
     return data;
   }
 
@@ -129,7 +142,8 @@ class EtherscanService {
     const noMatchingEntries = $tableRow.eq(0).find('.alert-warning').eq(0).text();
 
     if (noMatchingEntries) {
-      throw new HTTPNotFoundError(noMatchingEntries);
+      // throw new HTTPNotFoundError(noMatchingEntries);
+      return result;
     }
 
     $tableRow.each((idx, row) => {
