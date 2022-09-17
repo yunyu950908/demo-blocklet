@@ -8,12 +8,13 @@ const port = process.env.BLOCKLET_PORT || process.env.PORT || 3030;
 
 app.use('/api/etherscan', etherscanRouter);
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   res.status(err.httpStatusCode);
   res.json({
     code: err.errCode,
     message: err.message,
   });
+  next();
 });
 
 app.listen(port, () => {

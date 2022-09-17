@@ -1,6 +1,8 @@
 const querystring = require('node:querystring');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const HTTPBadRequestError = require('../errors/http-bad-request-error');
+const HTTPNotFoundError = require('../errors/http-not-found-error');
 
 class EtherscanService {
   constructor() {
@@ -37,6 +39,17 @@ class EtherscanService {
    * @returns {Array<Object>} returns what formatter returns
    */
   async getTradeHistory(address = '', page = 1) {
+    // an valid address should be hex represent like this: 0xeb2a81e229b68c1c22b6683275c00945f9872d90
+    const addressLength = 42;
+    const regexp = /[0-9A-Fa-f]{40}/;
+    if (address) {
+      if (address.length !== addressLength || !address.startsWith('0x') || !regexp.test(address.substring(2))) {
+        throw new HTTPBadRequestError('invalid param "address", please leave it empty or pass valid value');
+      }
+    }
+    if (page < 1) {
+      throw new HTTPBadRequestError('invalid param "page", please leave it empty or pass valid value');
+    }
     const rawHTML = await this.fetchRawHTML(address, page);
     const data = this.formatter(rawHTML);
     return data;
@@ -113,6 +126,12 @@ class EtherscanService {
     const $ = cheerio.load(html);
     const $tableRow = $('#paywall_mask tbody tr');
 
+    const noMatchingEntries = $tableRow.eq(0).find('.alert-warning').eq(0).text();
+
+    if (noMatchingEntries) {
+      throw new HTTPNotFoundError(noMatchingEntries);
+    }
+
     $tableRow.each((idx, row) => {
       const $rowCell = $(row).children('td');
 
@@ -124,6 +143,8 @@ class EtherscanService {
           serializedCell[k] =
             $($rowCell).eq(v).find('a').eq(0).attr('href')?.split('/').at(-1) ||
             $($rowCell).eq(v).find('span.hash-tag').eq(0).text();
+        } else if (v === columnIdxMap.Method) {
+          serializedCell[k] = $($rowCell).eq(v).children('span').eq(0).attr('title');
         } else {
           serializedCell[k] = $($rowCell).eq(v).text().trim();
         }
