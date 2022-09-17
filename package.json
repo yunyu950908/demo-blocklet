@@ -30,15 +30,17 @@
     "@arcblock/did-auth-storage-nedb": "^1.6.3",
     "@blocklet/sdk": "^1.8.13",
     "@ocap/client": "^1.17.16",
+    "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12",
     "dotenv-flow": "^3.2.0",
     "express": "^4.18.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.19",
     "@arcblock/eslint-config-base": "^0.2.3",
     "eslint": "^8.23.0",
     "husky": "^8.0.1",
     "lint-staged": "^12.5.0",
+    "nodemon": "^2.0.19",
     "prettier": "^2.7.1"
   }
 }
