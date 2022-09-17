@@ -1,5 +1,7 @@
 # Getting Started with Create Blocklet
 
+[![codecov](https://codecov.io/gh/yunyu950908/demo-blocklet/branch/main/graph/badge.svg?token=wSHIAK4hfM)](https://codecov.io/gh/yunyu950908/demo-blocklet)
+
 This project was bootstrapped with [Create Blocklet](https://github.com/blocklet/create-blocklet).
 
 This blocklet is a dapp project, which means this is a full-stack application. It's contained both `server` and `client` code.
