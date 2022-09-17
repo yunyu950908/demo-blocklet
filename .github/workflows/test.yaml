@@ -1,8 +1,23 @@
-steps:
-- uses: actions/checkout@v3
-- uses: actions/setup-node@v3
-  with:
-    node-version: 16
-- run: yarn
-- run: yarn run lint
-- run: yarn run test
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches:
+      - 'main'
+      - 'dev'
+      - 'master'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+    - run: yarn
+    - run: yarn run lint
+    - run: yarn run test
