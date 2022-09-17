@@ -6,11 +6,15 @@ const app = express();
 
 const port = process.env.BLOCKLET_PORT || process.env.PORT || 3030;
 
-app.get('/', (req, res) => {
-  res.send('Hello World, Blocklet!');
-});
+app.use('/api/etherscan', etherscanRouter);
 
-app.use('/etherscan', etherscanRouter);
+app.use((err, req, res) => {
+  res.status(err.httpStatusCode);
+  res.json({
+    code: err.errCode,
+    message: err.message,
+  });
+});
 
 app.listen(port, () => {
   console.log(`Blocklet app listening on port ${port}`);
