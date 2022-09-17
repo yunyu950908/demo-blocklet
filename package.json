@@ -4,6 +4,7 @@
   "description": "",
   "main": "api/index.js",
   "scripts": {
+    "test": "jest --coverage=true",
     "lint": "eslint api --ext .mjs,.js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
     "dev": "blocklet dev",
@@ -39,6 +40,7 @@
     "@arcblock/eslint-config-base": "^0.2.3",
     "eslint": "^8.23.0",
     "husky": "^8.0.1",
+    "jest": "^29.0.3",
     "lint-staged": "^12.5.0",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1"
